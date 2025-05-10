@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}My Account{% endblock %}
+
+{% block content %}
+<section class="account-header">
+    <h2>Welcome, {{ user.full_name or user.username }}</h2>
+    <div class="account-info">
+        <div class="info-card">
+            <h3>Personal Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="label">Name:</span>
+                    <span class="value">{{ user.full_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Age:</span>
+                    <span class="value">{{ user.age }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Gender:</span>
+                    <span class="value">{{ user.gender }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Diabetes Type:</span>
+                    <span class="value">{{ user.diabetes_type }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Diagnosis Date:</span>
+                    <span class="value">{{ user.diagnosis_date }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats-card">
+            <h3>Scan Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="number">12</span>
+                    <span class="label">Total Scans</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">3</span>
+                    <span class="label">Abnormal Results</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">75%</span>
+                    <span class="label">Normal Results</span>
+                </div>
+            </div>
+            <a href="{{ url_for('retinopathy') }}" class="btn primary">New Scan</a>
+        </div>
+    </div>
+</section>
+
+<section class="recent-scans">
+    <h3>Recent Scans</h3>
+    <div class="scans-grid">
+        {% for prediction in predictions %}
+        <div class="scan-card">
+            <div class="scan-image">
+                <img src="{{ url_for('static', filename=prediction.image_path) }}" alt="Retina Scan">
+            </div>
+            <div class="scan-info">
+                <div class="scan-date">{{ prediction.prediction_date.strftime('%b %d, %Y') }}</div>
+                <div class="scan-result {{ 'normal' if prediction.condition_detected == 'No DR' else 'abnormal' }}">
+                    {{ prediction.condition_detected }} ({{ "%.1f"|format(prediction.confidence * 100) }}%)
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p class="no-scans">No scan history yet. <a href="{{ url_for('retinopathy') }}">Perform your first scan</a>.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

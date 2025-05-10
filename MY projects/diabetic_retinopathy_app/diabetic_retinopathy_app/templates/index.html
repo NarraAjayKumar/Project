@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h2>Early Detection of Diabetic Retinopathy</h2>
+        <p>Our AI-powered platform helps detect signs of diabetic retinopathy from retinal images, enabling early intervention and treatment.</p>
+        {% if 'user_id' not in session %}
+            <div class="cta-buttons">
+                <a href="{{ url_for('login') }}" class="btn primary">Login</a>
+                <a href="{{ url_for('register') }}" class="btn secondary">Register</a>
+            </div>
+        {% else %}
+            <a href="{{ url_for('retinopathy') }}" class="btn primary">Start Scan</a>
+        {% endif %}
+    </div>
+    <div class="hero-image">
+        <img src="{{ url_for('static', filename='images/retina-scan.jpg') }}" alt="Retina Scan">
+    </div>
+</section>
+
+<section class="features">
+    <h3>Why Early Detection Matters</h3>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <i class="fas fa-eye"></i>
+            <h4>Vision Preservation</h4>
+            <p>Early detection can prevent up to 95% of vision loss from diabetic retinopathy.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-brain"></i>
+            <h4>AI-Powered Analysis</h4>
+            <p>Our advanced algorithms detect subtle changes invisible to the naked eye.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-history"></i>
+            <h4>Track Progression</h4>
+            <p>Monitor changes over time with your personal prediction history.</p>
+        </div>
+    </div>
+</section>
+
+<section class="about">
+    <h3>About Diabetic Retinopathy</h3>
+    <p>Diabetic retinopathy is a diabetes complication that affects eyes. It's caused by damage to the blood vessels of the light-sensitive tissue at the back of the eye (retina). At first, diabetic retinopathy might cause no symptoms or only mild vision problems. Eventually, it can cause blindness.</p>
+    
+    <div class="symptoms">
+        <h4>Symptoms to Watch For:</h4>
+        <ul>
+            <li>Spots or dark strings floating in your vision (floaters)</li>
+            <li>Blurred vision</li>
+            <li>Fluctuating vision</li>
+            <li>Dark or empty areas in your vision</li>
+            <li>Vision loss</li>
+        </ul>
+    </div>
+</section>
+{% endblock %}

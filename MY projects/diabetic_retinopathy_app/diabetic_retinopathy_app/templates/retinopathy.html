@@ -1,0 +1,346 @@
+{% extends "base.html" %} {% block title %}Retinopathy Scan{% endblock %} {%
+block content %}
+<section class="scan-container">
+  <h2>Diabetic Retinopathy Detection</h2>
+
+  <div class="scan-box {% if prediction %}has-result{% endif %}">
+    {% if not prediction %}
+    <div class="upload-area" id="uploadArea">
+      <i class="fas fa-cloud-upload-alt"></i>
+      <h3>Upload Retinal Image</h3>
+      <p>Drag & drop your retinal image here or click to browse</p>
+      <form method="POST" enctype="multipart/form-data" id="scanForm">
+        <div class="file-input-wrapper">
+          <input
+            type="file"
+            id="fileInput"
+            name="file"
+            accept="image/*"
+            style="display: none"
+            required
+          />
+          <button type="button" class="btn primary" id="uploadButton">
+            Select Image
+          </button>
+          <span id="fileName"></span>
+        </div>
+      </form>
+    </div>
+    {% else %}
+    <div class="result-area">
+      <div class="result-image">
+        <img
+          src="{{ url_for('static', filename=image_url) }}"
+          alt="Scan Result"
+        />
+        <div
+          class="result-overlay {{ 'normal' if prediction.condition == 'No DR' else 'abnormal' }}"
+        >
+          {{ prediction.condition }} ({{ "%.1f"|format(prediction.confidence *
+          100) }}%)
+        </div>
+      </div>
+
+      <div class="result-details">
+        <h3>Analysis Result</h3>
+        <div
+          class="result-condition {{ 'normal' if prediction.condition == 'No DR' else 'abnormal' }}"
+        >
+          {{ prediction.condition }}
+        </div>
+        <div class="confidence">
+          Confidence: {{ "%.1f"|format(prediction.confidence * 100) }}%
+        </div>
+
+        {% if prediction.condition != 'No DR' %}
+        <div class="recommendation">
+          <h4>Recommendation</h4>
+          <p>
+            Our analysis detected signs of {{ prediction.condition }}. We
+            recommend consulting an ophthalmologist for further evaluation and
+            possible treatment.
+          </p>
+        </div>
+        {% else %}
+        <div class="recommendation">
+          <h4>Recommendation</h4>
+          <p>
+            No signs of diabetic retinopathy detected. Continue with regular
+            checkups as recommended by your doctor.
+          </p>
+        </div>
+        {% endif %}
+
+        <div class="result-actions">
+          <a href="{{ url_for('retinopathy') }}" class="btn primary"
+            >New Scan</a
+          >
+          <a href="{{ url_for('account') }}" class="btn secondary"
+            >View History</a
+          >
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="scan-info">
+    <h3>How to Get the Best Results</h3>
+    <ul>
+      <li>Use high-quality retinal images (fundus photographs)</li>
+      <li>Ensure proper lighting and focus</li>
+      <li>Upload images in JPG or PNG format</li>
+      <li>For tracking progression, use consistent imaging conditions</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("fileInput");
+    const fileNameDisplay = document.getElementById("fileName");
+    const uploadButton = document.getElementById("uploadButton");
+    const uploadArea = document.getElementById("uploadArea");
+    const scanForm = document.getElementById("scanForm");
+
+    if (fileInput && uploadArea && scanForm && uploadButton) {
+      // Handle click on upload button
+      uploadButton.addEventListener("click", function () {
+        fileInput.click();
+      });
+
+      // Handle file selection
+      fileInput.addEventListener("change", function () {
+        if (this.files && this.files.length) {
+          fileNameDisplay.textContent = this.files[0].name;
+          scanForm.submit();
+        }
+      });
+
+      // Drag and drop functionality
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, highlight, false);
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        uploadArea.addEventListener(eventName, unhighlight, false);
+      });
+
+      uploadArea.addEventListener("drop", handleDrop, false);
+    }
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function highlight() {
+      uploadArea.classList.add("highlight");
+    }
+
+    function unhighlight() {
+      uploadArea.classList.remove("highlight");
+    }
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+
+      if (files.length) {
+        fileInput.files = files;
+        fileNameDisplay.textContent = files[0].name;
+        scanForm.submit();
+      }
+    }
+  });
+</script>
+
+<style>
+  .scan-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .scan-box {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .upload-area {
+    text-align: center;
+    padding: 3rem 2rem;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+
+  .upload-area.highlight {
+    border-color: #4caf50;
+    background-color: #f8f9fa;
+  }
+
+  .upload-area i {
+    font-size: 3rem;
+    color: #4caf50;
+    margin-bottom: 1rem;
+  }
+
+  .upload-area h3 {
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  .upload-area p {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .file-input-wrapper {
+    margin-top: 1rem;
+  }
+
+  #fileName {
+    display: block;
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .result-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .result-image {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+  }
+
+  .result-image img {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .result-overlay {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .result-overlay.normal {
+    background-color: #4caf50;
+  }
+
+  .result-overlay.abnormal {
+    background-color: #f44336;
+  }
+
+  .result-details {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .result-condition {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0.5rem 0;
+  }
+
+  .result-condition.normal {
+    color: #4caf50;
+  }
+
+  .result-condition.abnormal {
+    color: #f44336;
+  }
+
+  .confidence {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
+
+  .recommendation {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+  }
+
+  .recommendation h4 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .scan-info {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+
+  .scan-info h3 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .scan-info ul {
+    padding-left: 1.5rem;
+  }
+
+  .scan-info li {
+    margin-bottom: 0.5rem;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn.primary {
+    background-color: #4caf50;
+    color: white;
+  }
+
+  .btn.primary:hover {
+    background-color: #3e8e41;
+  }
+
+  .btn.secondary {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+
+  .btn.secondary:hover {
+    background-color: #e9ecef;
+  }
+</style>
+{% endblock %}

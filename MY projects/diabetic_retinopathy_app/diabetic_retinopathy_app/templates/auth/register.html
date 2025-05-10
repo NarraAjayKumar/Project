@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Create Your Account</h2>
+        
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="form-group">
+                <label for="username">Username*</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email*</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password*</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="full_name">Full Name*</label>
+                <input type="text" id="full_name" name="full_name" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" min="1" max="120">
+                </div>
+                
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" name="gender">
+                        <option value="">Select</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="diabetes_type">Diabetes Type</label>
+                <select id="diabetes_type" name="diabetes_type">
+                    <option value="">Select</option>
+                    <option value="Type 1">Type 1</option>
+                    <option value="Type 2">Type 2</option>
+                    <option value="Gestational">Gestational</option>
+                    <option value="Pre-diabetes">Pre-diabetes</option>
+                    <option value="None">None</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="diagnosis_date">Diagnosis Date</label>
+                <input type="date" id="diagnosis_date" name="diagnosis_date">
+            </div>
+            
+            <button type="submit" class="btn primary">Register</button>
+        </form>
+        
+        <div class="auth-links">
+            <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
