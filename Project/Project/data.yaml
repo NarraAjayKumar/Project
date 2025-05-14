@@ -1,0 +1,6 @@
+names:
+- good-to-harvest
+- not-good-to-harvest
+nc: 2
+train: C:\MurthyLab\Project\project\train\images
+val: C:\MurthyLab\Project\project\val\images
